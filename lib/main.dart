@@ -1,7 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:dio/dio.dart';
+
+final dio = Dio();
 
 void main() {
   runApp(const MyApp());
+}
+
+//create the view model
+
+class MyHomePageViewModel extends ChangeNotifier {
+  int _counter = 0;
+
+  int get counter => _counter;
+
+  void incrementCounter() {
+    _counter++;
+    notifyListeners();
+  }
+
+  Future<String> getHttp() async {
+    final response =
+        await dio.get('https://channel.api.nanosoft.co.za/app/campaign/0517/participant/0000002C/registrations');
+    return response.data;
+  }
 }
 
 class MyApp extends StatelessWidget {
@@ -15,35 +37,32 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'Flutter MVVM'),
+      home: MyHomePage(title: 'MVVM'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class MyHomePage extends StatelessWidget {
+  MyHomePage({super.key, required this.title});
+  final MyHomePageViewModel _viewModel = MyHomePageViewModel();
 
   final String title;
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
   void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
+    _viewModel.incrementCounter();
   }
 
   @override
   Widget build(BuildContext context) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      // Your method here
+      var data = await _viewModel.getHttp();
+      print(data);
+    });
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(title),
       ),
       body: Center(
         child: Column(
@@ -52,10 +71,14 @@ class _MyHomePageState extends State<MyHomePage> {
             const Text(
               'You have pushed the button this many times:',
             ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
+            ListenableBuilder(
+                listenable: _viewModel,
+                builder: (BuildContext context, child) {
+                  return Text(
+                    '${_viewModel.counter}',
+                    style: Theme.of(context).textTheme.headlineMedium,
+                  );
+                })
           ],
         ),
       ),
