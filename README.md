@@ -47,10 +47,12 @@ The cool part about MVVM is that it keeps these sections separate. The View does
             ├── models/
             │   └── task.dart
             └── services/
+                ├── http_client.dart
+                ├── dio_wrapper.dart
                 └── task_service.dart
 ```
 
-Let's start with the model
+### Task Model
 
 ```dart
 class Task {
@@ -90,6 +92,205 @@ class Task {
     };
   }
 }
+
+```
+
+### Task Service
+
+
+```dart
+import 'package:dio/dio.dart';
+import 'package:task_management_app/models/task.dart';
+
+class TaskService {
+  final Dio _dio = Dio();
+  final String baseUrl = 'https://your-api-url/tasks';
+
+  Future<List<Task>> fetchTasks() async {
+    try {
+      final response = await _dio.get(baseUrl);
+      final List<dynamic> responseData = response.data;
+      return responseData.map((json) => Task.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch tasks');
+    }
+  }
+
+  Future<Task> createTask(Task task) async {
+    try {
+      final response = await _dio.post(
+        baseUrl,
+        data: task.toJson(),
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+      return Task.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Failed to create task');
+    }
+  }
+
+  Future<void> updateTask(Task task) async {
+    try {
+      await _dio.put(
+        '$baseUrl/${task.id}',
+        data: task.toJson(),
+        options: Options(headers: {'Content-Type': 'application/json'}),
+      );
+    } catch (e) {
+      throw Exception('Failed to update task');
+    }
+  }
+
+  Future<void> deleteTask(String taskId) async {
+    try {
+      await _dio.delete('$baseUrl/$taskId');
+    } catch (e) {
+      throw Exception('Failed to delete task');
+    }
+  }
+}
+
+```
+
+To make the Service testable we need to create a wrapper for Dio that allows for dependency injection into the service. 
+We can define an interface for the wrapper and provide an implementation that wraps Dio. This approach enables us to easily mock the wrapper for testing purposes:
+
+First, define the wrapper interface:
+
+```dart
+//
+abstract class HttpClient {
+  Future<Response> get(String path, {Map<String, dynamic>? queryParameters});
+  Future<Response> post(String path, {dynamic data});
+  Future<Response> put(String path, {dynamic data});
+  Future<Response> delete(String path);
+}
+```
+
+Next, implement the wrapper using Dio:
+
+```dart
+import 'package:dio/dio.dart';
+
+class DioWrapper implements HttpClient {
+  final Dio _dio = Dio();
+
+  @override
+  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) {
+    return _dio.get(path, queryParameters: queryParameters);
+  }
+
+  @override
+  Future<Response> post(String path, {dynamic data}) {
+    return _dio.post(path, data: data);
+  }
+
+  @override
+  Future<Response> put(String path, {dynamic data}) {
+    return _dio.put(path, data: data);
+  }
+
+  @override
+  Future<Response> delete(String path) {
+    return _dio.delete(path);
+  }
+}
+
+```
+
+Now, update the TaskService class to accept an instance of HttpClient in its constructor:
+
+```dart
+import 'package:dio/dio.dart';
+import 'http_client.dart'; // Import the HttpClient interface
+
+class TaskService {
+  final HttpClient _httpClient;
+
+  TaskService(this._httpClient); // Inject the HttpClient instance
+
+  final String baseUrl = 'https://your-api-url/tasks';
+
+  Future<List<Task>> fetchTasks() async {
+    try {
+      final response = await _httpClient.get(baseUrl);
+      final List<dynamic> responseData = response.data;
+      return responseData.map((json) => Task.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Failed to fetch tasks');
+    }
+  }
+
+  // Other methods remain unchanged...
+}
+
+```
+
+With this setup, you can create and inject mock implementations of HttpClient for testing purposes. This allows you to isolate the TaskService class and test its behavior independently of the actual network calls implementation.
+
+
+```dart
+import 'package:flutter/foundation.dart';
+import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
+import 'package:mvvm/features/task_management/models/task.dart';
+import 'package:mvvm/features/task_management/services/http_client.dart';
+import 'package:mvvm/features/task_management/services/task_service.dart';
+
+class MockHttpClient extends Mock implements HttpClient {}
+
+void main() {
+  group('TaskService', () {
+    late TaskService taskService;
+    late MockHttpClient mockHttpClient;
+
+    setUp(() {
+      mockHttpClient = MockHttpClient();
+      taskService = TaskService(mockHttpClient);
+    });
+
+    test('fetchTasks - success', () async {
+      // Arrange
+      final tasksJson = [
+        {
+          'id': '1',
+          'title': 'Task 1',
+          'description': 'Description 1',
+          'dueDate': '2022-12-31T00:00:00.000Z',
+          'isCompleted': false,
+        },
+        {
+          'id': '2',
+          'title': 'Task 2',
+          'description': 'Description 2',
+          'dueDate': '2022-12-31T00:00:00.000Z',
+          'isCompleted': true,
+        },
+      ];
+      final expectedTasks = tasksJson.map((json) => Task.fromJson(json)).toList();
+      when(() => mockHttpClient.get("https://your-api-url/tasks")).thenAnswer((_) async => HttpResponse(
+            data: tasksJson,
+            statusCode: 200,
+            message: 'OK',
+          ));
+
+      // Act
+      final result = await taskService.fetchTasks();
+
+      // Assert
+      expect(listEquals(result, expectedTasks), true);
+    });
+
+    test('fetchTasks - failure', () async {
+      // Arrange
+      when(() => mockHttpClient.get("url")).thenThrow(Exception('Failed to fetch tasks'));
+
+      // Act & Assert
+      expect(() async => await taskService.fetchTasks(), throwsException);
+    });
+  });
+}
+
 
 ```
 
