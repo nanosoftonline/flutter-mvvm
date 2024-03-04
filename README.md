@@ -55,14 +55,17 @@ The cool part about MVVM is that it keeps these sections separate. The View does
 ### Task Model
 
 ```dart
-class Task {
+//models/task.dart
+import 'package:equatable/equatable.dart';
+
+class Task extends Equatable {
   final String id;
   final String title;
   final String description;
   final DateTime dueDate;
   final bool isCompleted;
 
-  Task({
+  const Task({
     required this.id,
     required this.title,
     required this.description,
@@ -91,7 +94,17 @@ class Task {
       'isCompleted': isCompleted,
     };
   }
+
+  @override
+  List<Object?> get props => [
+        id,
+        title,
+        description,
+        dueDate,
+        isCompleted,
+      ];
 }
+
 
 ```
 
@@ -158,51 +171,71 @@ We can define an interface for the wrapper and provide an implementation that wr
 First, define the wrapper interface:
 
 ```dart
-//
-abstract class HttpClient {
-  Future<Response> get(String path, {Map<String, dynamic>? queryParameters});
-  Future<Response> post(String path, {dynamic data});
-  Future<Response> put(String path, {dynamic data});
-  Future<Response> delete(String path);
+//services/http_client.dart
+class HttpResponse {
+  final dynamic data;
+  final int statusCode;
+  final String message;
+
+  HttpResponse({
+    required this.data,
+    required this.statusCode,
+    required this.message,
+  });
 }
+
+abstract class HttpClient {
+  Future<HttpResponse> get(String path, {Map<String, dynamic>? queryParameters});
+  Future<HttpResponse> post(String path, {dynamic data});
+  Future<HttpResponse> put(String path, {dynamic data});
+  Future<HttpResponse> delete(String path);
+}
+
 ```
 
 Next, implement the wrapper using Dio:
 
 ```dart
 import 'package:dio/dio.dart';
+import 'package:mvvm/features/task_management/services/http_client.dart';
 
 class DioWrapper implements HttpClient {
   final Dio _dio = Dio();
 
   @override
-  Future<Response> get(String path, {Map<String, dynamic>? queryParameters}) {
-    return _dio.get(path, queryParameters: queryParameters);
+  Future<HttpResponse> get(String path, {Map<String, dynamic>? queryParameters}) async {
+    var res = await _dio.get(path, queryParameters: queryParameters);
+    return HttpResponse(data: res.data, statusCode: res.statusCode!, message: res.statusMessage!);
   }
 
   @override
-  Future<Response> post(String path, {dynamic data}) {
-    return _dio.post(path, data: data);
+  Future<HttpResponse> post(String path, {dynamic data}) async {
+    var res = await _dio.post(path, data: data);
+    return HttpResponse(data: res.data, statusCode: res.statusCode!, message: res.statusMessage!);
   }
 
   @override
-  Future<Response> put(String path, {dynamic data}) {
-    return _dio.put(path, data: data);
+  Future<HttpResponse> put(String path, {dynamic data}) async {
+    var res = await _dio.put(path, data: data);
+    return HttpResponse(data: res.data, statusCode: res.statusCode!, message: res.statusMessage!);
   }
 
   @override
-  Future<Response> delete(String path) {
-    return _dio.delete(path);
+  Future<HttpResponse> delete(String path) async {
+    var res = await _dio.delete(path);
+    return HttpResponse(data: res.data, statusCode: res.statusCode!, message: res.statusMessage!);
   }
 }
+
 
 ```
 
 Now, update the TaskService class to accept an instance of HttpClient in its constructor:
 
 ```dart
-import 'package:dio/dio.dart';
-import 'http_client.dart'; // Import the HttpClient interface
+//services/task_service.dart
+import 'package:mvvm/features/task_management/models/task.dart';
+import 'package:mvvm/features/task_management/services/http_client.dart';
 
 class TaskService {
   final HttpClient _httpClient;
@@ -221,8 +254,38 @@ class TaskService {
     }
   }
 
-  // Other methods remain unchanged...
+  Future<Task> createTask(Task task) async {
+    try {
+      final response = await _httpClient.post(
+        baseUrl,
+        data: task.toJson(),
+      );
+      return Task.fromJson(response.data);
+    } catch (e) {
+      throw Exception('Failed to create task');
+    }
+  }
+
+  Future<void> updateTask(Task task) async {
+    try {
+      await _httpClient.put(
+        '$baseUrl/${task.id}',
+        data: task.toJson(),
+      );
+    } catch (e) {
+      throw Exception('Failed to update task');
+    }
+  }
+
+  Future<void> deleteTask(String taskId) async {
+    try {
+      await _httpClient.delete('$baseUrl/$taskId');
+    } catch (e) {
+      throw Exception('Failed to delete task');
+    }
+  }
 }
+
 
 ```
 
@@ -230,6 +293,8 @@ With this setup, you can create and inject mock implementations of HttpClient fo
 
 
 ```dart
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
@@ -288,8 +353,11 @@ void main() {
       // Act & Assert
       expect(() async => await taskService.fetchTasks(), throwsException);
     });
+
+    ....
   });
 }
+
 
 
 ```

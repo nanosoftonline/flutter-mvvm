@@ -22,9 +22,10 @@ class TaskService {
     try {
       final response = await _httpClient.post(
         baseUrl,
-        data: task.toJson(),
+        task.toJson(),
       );
-      return Task.fromJson(response.data);
+      final responseData = Task.fromJson(response.data);
+      return responseData;
     } catch (e) {
       throw Exception('Failed to create task');
     }
@@ -34,7 +35,7 @@ class TaskService {
     try {
       await _httpClient.put(
         '$baseUrl/${task.id}',
-        data: task.toJson(),
+        task.toJson(),
       );
     } catch (e) {
       throw Exception('Failed to update task');

@@ -12,7 +12,7 @@ class HttpResponse {
 
 abstract class HttpClient {
   Future<HttpResponse> get(String path, {Map<String, dynamic>? queryParameters});
-  Future<HttpResponse> post(String path, {dynamic data});
-  Future<HttpResponse> put(String path, {dynamic data});
+  Future<HttpResponse> post(String path, dynamic data);
+  Future<HttpResponse> put(String path, dynamic data);
   Future<HttpResponse> delete(String path);
 }

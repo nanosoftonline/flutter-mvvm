@@ -1,14 +1,14 @@
 import 'package:equatable/equatable.dart';
 
 class Task extends Equatable {
-  final String id;
+  final String? id;
   final String title;
   final String description;
   final DateTime dueDate;
   final bool isCompleted;
 
-  Task({
-    required this.id,
+  const Task({
+    this.id,
     required this.title,
     required this.description,
     required this.dueDate,
@@ -26,8 +26,16 @@ class Task extends Equatable {
     );
   }
 
-  // Method to convert Task object to JSON data
   Map<String, dynamic> toJson() {
+    if (id == null) {
+      return {
+        'title': title,
+        'description': description,
+        'dueDate': dueDate.toIso8601String(),
+        'isCompleted': isCompleted,
+      };
+    }
+
     return {
       'id': id,
       'title': title,

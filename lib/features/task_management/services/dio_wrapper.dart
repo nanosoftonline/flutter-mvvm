@@ -11,13 +11,13 @@ class DioWrapper implements HttpClient {
   }
 
   @override
-  Future<HttpResponse> post(String path, {dynamic data}) async {
+  Future<HttpResponse> post(String path, dynamic data) async {
     var res = await _dio.post(path, data: data);
     return HttpResponse(data: res.data, statusCode: res.statusCode!, message: res.statusMessage!);
   }
 
   @override
-  Future<HttpResponse> put(String path, {dynamic data}) async {
+  Future<HttpResponse> put(String path, dynamic data) async {
     var res = await _dio.put(path, data: data);
     return HttpResponse(data: res.data, statusCode: res.statusCode!, message: res.statusMessage!);
   }
