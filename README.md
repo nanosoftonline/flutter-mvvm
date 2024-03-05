@@ -2,7 +2,7 @@
 
 At times, you might develop an application that primarily interacts with a service, in containing minimal business logic within the app. In such scenarios, a complex multi-layered structure isn't necessary, but a solution that remains testable is still crucial.
 
-In this blog post, we'll explore implementing a FDD(Feaure Driven Development) MVVM in Flutter, focusing specifically on interacting with a JSON API.
+In this blog post, we'll explore implementing a FDD(Feaure Driven Development) MVVM Flutter app, focusing specifically on interacting with a JSON API.
 
 ### Feature Driven Development
 
@@ -108,6 +108,16 @@ class Task extends Equatable {
 
 ```
 
+In this model:
+
+The Task class represents a task in the task management application.
+It has properties such as id, title, description, dueDate, and isCompleted.
+The constructor initializes these properties when creating a Task object.
+The fromJson factory method converts JSON data (often received from an API) into a Task object.
+The toJson method converts a Task object into JSON data (often used when sending data to an API).
+
+To handle the logic of creating, deleting, updating, and listing tasks, you can encapsulate these operations within a service class responsible for interacting with the data source (e.g., a database, API). Here's a simplified example of how you might implement such a service class:
+
 ### Task Service
 
 
@@ -165,8 +175,8 @@ class TaskService {
 
 ```
 
-To make the Service testable we need to create a wrapper for Dio that allows for dependency injection into the service. 
-We can define an interface for the wrapper and provide an implementation that wraps Dio. This approach enables us to easily mock the wrapper for testing purposes:
+To make the Service testable and not to let it be dependent on any technical implementation, we need to create a wrapper for Dio that allows for dependency injection into the service. 
+To always do this we need to define an interface for the wrapper and provide an implementation that wraps Dio. This approach enables us to easily mock the wrapper for testing purposes:
 
 First, define the wrapper interface:
 
@@ -186,14 +196,14 @@ class HttpResponse {
 
 abstract class HttpClient {
   Future<HttpResponse> get(String path, {Map<String, dynamic>? queryParameters});
-  Future<HttpResponse> post(String path, {dynamic data});
-  Future<HttpResponse> put(String path, {dynamic data});
+  Future<HttpResponse> post(String path, dynamic data);
+  Future<HttpResponse> put(String path, dynamic data);
   Future<HttpResponse> delete(String path);
 }
 
-```
 
-Next, implement the wrapper using Dio:
+```
+Next, implement the wrapper using Dio which iimplements this interface:
 
 ```dart
 import 'package:dio/dio.dart';
@@ -209,13 +219,13 @@ class DioWrapper implements HttpClient {
   }
 
   @override
-  Future<HttpResponse> post(String path, {dynamic data}) async {
+  Future<HttpResponse> post(String path, dynamic data) async {
     var res = await _dio.post(path, data: data);
     return HttpResponse(data: res.data, statusCode: res.statusCode!, message: res.statusMessage!);
   }
 
   @override
-  Future<HttpResponse> put(String path, {dynamic data}) async {
+  Future<HttpResponse> put(String path, dynamic data) async {
     var res = await _dio.put(path, data: data);
     return HttpResponse(data: res.data, statusCode: res.statusCode!, message: res.statusMessage!);
   }
@@ -226,6 +236,7 @@ class DioWrapper implements HttpClient {
     return HttpResponse(data: res.data, statusCode: res.statusCode!, message: res.statusMessage!);
   }
 }
+
 
 
 ```
@@ -258,9 +269,10 @@ class TaskService {
     try {
       final response = await _httpClient.post(
         baseUrl,
-        data: task.toJson(),
+        task.toJson(),
       );
-      return Task.fromJson(response.data);
+      final responseData = Task.fromJson(response.data);
+      return responseData;
     } catch (e) {
       throw Exception('Failed to create task');
     }
@@ -270,7 +282,7 @@ class TaskService {
     try {
       await _httpClient.put(
         '$baseUrl/${task.id}',
-        data: task.toJson(),
+        task.toJson(),
       );
     } catch (e) {
       throw Exception('Failed to update task');
@@ -354,7 +366,7 @@ void main() {
       expect(() async => await taskService.fetchTasks(), throwsException);
     });
 
-    ....
+    // Other tests...
   });
 }
 

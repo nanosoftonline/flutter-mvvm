@@ -1,13 +1,15 @@
 import 'package:mvvm/features/task_management/models/task.dart';
 import 'package:mvvm/features/task_management/services/http_client.dart';
+import 'package:mvvm/features/task_management/services/task_service_contract.dart';
 
-class TaskService {
+class TaskService implements ITaskService {
   final HttpClient _httpClient;
 
   TaskService(this._httpClient); // Inject the HttpClient instance
 
-  final String baseUrl = 'https://your-api-url/tasks';
+  final String baseUrl = 'http://localhost:3000/tasks';
 
+  @override
   Future<List<Task>> fetchTasks() async {
     try {
       final response = await _httpClient.get(baseUrl);
@@ -18,6 +20,7 @@ class TaskService {
     }
   }
 
+  @override
   Future<Task> createTask(Task task) async {
     try {
       final response = await _httpClient.post(
@@ -31,6 +34,7 @@ class TaskService {
     }
   }
 
+  @override
   Future<void> updateTask(Task task) async {
     try {
       await _httpClient.put(
@@ -42,6 +46,7 @@ class TaskService {
     }
   }
 
+  @override
   Future<void> deleteTask(String taskId) async {
     try {
       await _httpClient.delete('$baseUrl/$taskId');
