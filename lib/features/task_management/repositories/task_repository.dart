@@ -1,18 +1,25 @@
+import 'package:mvvm/config.dart';
 import 'package:mvvm/features/task_management/models/task.dart';
-import 'package:mvvm/features/task_management/services/http_client.dart';
-import 'package:mvvm/features/task_management/services/task_service_contract.dart';
+import 'package:mvvm/features/task_management/repositories/http_client.dart';
 
-class TaskService implements ITaskService {
+const baseUrl = Config.apiBase;
+
+abstract class ITaskRepository {
+  Future<List<Task>> fetchTasks();
+  Future<Task> createTask(Task task);
+  Future<void> updateTask(Task task);
+  Future<void> deleteTask(String taskId);
+}
+
+class TaskRepository implements ITaskRepository {
   final HttpClient _httpClient;
 
-  TaskService(this._httpClient); // Inject the HttpClient instance
-
-  final String baseUrl = 'http://localhost:3000/tasks';
+  TaskRepository(this._httpClient); // Inject the HttpClient instance
 
   @override
   Future<List<Task>> fetchTasks() async {
     try {
-      final response = await _httpClient.get(baseUrl);
+      final response = await _httpClient.get("$baseUrl/tasks");
       final List<dynamic> responseData = response.data;
       return responseData.map((json) => Task.fromJson(json)).toList();
     } catch (e) {
@@ -23,12 +30,12 @@ class TaskService implements ITaskService {
   @override
   Future<Task> createTask(Task task) async {
     try {
-      final response = await _httpClient.post(
-        baseUrl,
+      var res = await _httpClient.post(
+        "$baseUrl/tasks",
         task.toJson(),
       );
-      final responseData = Task.fromJson(response.data);
-      return responseData;
+
+      return Task.fromJson(res.data);
     } catch (e) {
       throw Exception('Failed to create task');
     }
@@ -38,7 +45,7 @@ class TaskService implements ITaskService {
   Future<void> updateTask(Task task) async {
     try {
       await _httpClient.put(
-        '$baseUrl/${task.id}',
+        '$baseUrl/tasks/${task.id}',
         task.toJson(),
       );
     } catch (e) {
@@ -49,7 +56,7 @@ class TaskService implements ITaskService {
   @override
   Future<void> deleteTask(String taskId) async {
     try {
-      await _httpClient.delete('$baseUrl/$taskId');
+      await _httpClient.delete('$baseUrl/tasks/$taskId');
     } catch (e) {
       throw Exception('Failed to delete task');
     }

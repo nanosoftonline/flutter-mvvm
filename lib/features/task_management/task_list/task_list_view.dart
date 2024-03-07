@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:mvvm/features/task_management/services/dio_wrapper.dart';
-import 'package:mvvm/features/task_management/services/task_service.dart';
-import 'package:mvvm/features/task_management/views/task_list/task_list_view_model.dart';
+import 'package:mvvm/features/task_management/components/task_list.dart';
+import 'package:mvvm/features/task_management/repositories/dio_wrapper.dart';
+import 'package:mvvm/features/task_management/repositories/task_repository.dart';
+import 'package:mvvm/features/task_management/task_list/task_list_view_model.dart';
 
 class TaskListView extends StatelessWidget {
-  final TaskListViewModel viewModel = TaskListViewModel(TaskService(DioWrapper()));
+  final TaskListViewModel viewModel = TaskListViewModel(TaskRepository(DioWrapper()));
 
   TaskListView({super.key});
 
@@ -34,16 +35,7 @@ class TaskListView extends StatelessWidget {
             if (viewModel.hasError) {
               return Center(child: Text(viewModel.errorMessage));
             }
-            return ListView.builder(
-              itemCount: viewModel.tasks.length,
-              itemBuilder: (context, index) {
-                final task = viewModel.tasks[index];
-                return ListTile(
-                  title: Text(task.title),
-                  subtitle: Text(task.description),
-                );
-              },
-            );
+            return TaskList(tasks: viewModel.tasks);
           },
         ));
   }

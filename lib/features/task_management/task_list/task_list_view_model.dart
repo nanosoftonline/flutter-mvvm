@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm/features/task_management/models/task.dart';
-import 'package:mvvm/features/task_management/services/task_service.dart';
+import 'package:mvvm/features/task_management/repositories/task_repository.dart';
 
 class TaskListViewModel with ChangeNotifier {
-  final TaskService _taskService;
+  final ITaskRepository taskRepo;
   List<Task> _tasks = [];
   bool _isLoading = false;
   bool _hasError = false;
   String _errorMessage = '';
 
-  TaskListViewModel(this._taskService);
+  TaskListViewModel(this.taskRepo);
 
   List<Task> get tasks => _tasks;
   bool get isLoading => _isLoading;
@@ -20,7 +20,7 @@ class TaskListViewModel with ChangeNotifier {
     try {
       _isLoading = true;
       notifyListeners();
-      _tasks = await _taskService.fetchTasks();
+      _tasks = await taskRepo.fetchTasks();
     } catch (e) {
       _hasError = true;
       _errorMessage = 'Failed to fetch tasks';

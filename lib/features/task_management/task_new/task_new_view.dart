@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:mvvm/features/task_management/services/dio_wrapper.dart';
-import 'package:mvvm/features/task_management/services/task_service.dart';
-import 'package:mvvm/features/task_management/views/task_new/task_new_view_model.dart';
+import 'package:mvvm/features/task_management/repositories/dio_wrapper.dart';
+import 'package:mvvm/features/task_management/repositories/task_repository.dart';
+import 'package:mvvm/features/task_management/task_new/task_new_view_model.dart';
 
 class CreateTaskView extends StatelessWidget {
-  final CreateTaskViewModel _viewModel = CreateTaskViewModel(TaskService(DioWrapper()));
+  final TaskNewViewModel _viewModel = TaskNewViewModel(TaskRepository(DioWrapper()));
 
   CreateTaskView({super.key});
 

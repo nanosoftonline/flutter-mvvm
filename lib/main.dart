@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:mvvm/features/task_management/views/task_list/task_list_view.dart';
-import 'package:mvvm/features/task_management/views/task_new/task_new_view.dart';
+import 'package:mvvm/features/task_management/task_list/task_list_view.dart';
+import 'package:mvvm/features/task_management/task_new/task_new_view.dart';
 
 final dio = Dio();
 

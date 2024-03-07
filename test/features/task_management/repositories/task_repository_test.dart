@@ -1,20 +1,23 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
+import 'package:mvvm/config.dart';
 import 'package:mvvm/features/task_management/models/task.dart';
-import 'package:mvvm/features/task_management/services/http_client.dart';
-import 'package:mvvm/features/task_management/services/task_service.dart';
+import 'package:mvvm/features/task_management/repositories/http_client.dart';
+import 'package:mvvm/features/task_management/repositories/task_repository.dart';
+
+const baseUrl = Config.apiBase;
 
 class MockHttpClient extends Mock implements HttpClient {}
 
 void main() {
-  group('TaskService', () {
-    late TaskService taskService;
+  group('TaskRepository', () {
+    late TaskRepository taskRepo;
     late MockHttpClient mockHttpClient;
 
     setUp(() {
       mockHttpClient = MockHttpClient();
-      taskService = TaskService(mockHttpClient);
+      taskRepo = TaskRepository(mockHttpClient);
     });
 
     test('fetchTasks - success', () async {
@@ -36,14 +39,14 @@ void main() {
         },
       ];
       final expectedTasks = tasksJson.map((json) => Task.fromJson(json)).toList();
-      when(() => mockHttpClient.get("https://your-api-url/tasks")).thenAnswer((_) async => HttpResponse(
+      when(() => mockHttpClient.get("$baseUrl/tasks")).thenAnswer((_) async => HttpResponse(
             data: tasksJson,
             statusCode: 200,
             message: 'OK',
           ));
 
       // Act
-      final result = await taskService.fetchTasks();
+      final result = await taskRepo.fetchTasks();
 
       // Assert
       expect(listEquals(result, expectedTasks), true);
@@ -54,7 +57,7 @@ void main() {
       when(() => mockHttpClient.get("url")).thenThrow(Exception('Failed to fetch tasks'));
 
       // Act & Assert
-      expect(() async => await taskService.fetchTasks(), throwsException);
+      expect(() async => await taskRepo.fetchTasks(), throwsException);
     });
 
     test('createTask - success', () async {
@@ -68,14 +71,14 @@ void main() {
 
       final expectedResult = newTaskJson..addAll({'id': '1'});
 
-      when(() => mockHttpClient.post("https://your-api-url/tasks", newTaskJson)).thenAnswer((_) async => HttpResponse(
+      when(() => mockHttpClient.post("$baseUrl/tasks", newTaskJson)).thenAnswer((_) async => HttpResponse(
             data: expectedResult,
             statusCode: 200,
             message: 'OK',
           ));
 
       // Act
-      final result = await taskService.createTask(Task.fromJson(newTaskJson));
+      final result = await taskRepo.createTask(Task.fromJson(newTaskJson));
 
       // Assert
       expect(result, Task.fromJson(expectedResult));
@@ -98,7 +101,7 @@ void main() {
       var error;
 
       try {
-        await taskService.createTask(Task.fromJson(newTaskJson));
+        await taskRepo.createTask(Task.fromJson(newTaskJson));
       } catch (e) {
         error = e;
       }
@@ -117,15 +120,14 @@ void main() {
         'isCompleted': false,
       };
 
-      when(() => mockHttpClient.put("https://your-api-url/tasks/1", updatedTaskJson))
-          .thenAnswer((_) async => HttpResponse(
-                data: updatedTaskJson,
-                statusCode: 200,
-                message: 'OK',
-              ));
+      when(() => mockHttpClient.put("$baseUrl/tasks/1", updatedTaskJson)).thenAnswer((_) async => HttpResponse(
+            data: updatedTaskJson,
+            statusCode: 200,
+            message: 'OK',
+          ));
 
       // Act and Assert
-      await taskService.updateTask(Task.fromJson(updatedTaskJson));
+      await taskRepo.updateTask(Task.fromJson(updatedTaskJson));
     });
 
     test('updateTask - failure', () async {
@@ -145,7 +147,7 @@ void main() {
       var error;
 
       try {
-        await taskService.updateTask(Task.fromJson(updatedTaskJson));
+        await taskRepo.updateTask(Task.fromJson(updatedTaskJson));
       } catch (e) {
         error = e;
       }
@@ -156,14 +158,14 @@ void main() {
 
     test('deleteTask - success', () async {
       // Arrange
-      when(() => mockHttpClient.delete("https://your-api-url/tasks/1")).thenAnswer((_) async => HttpResponse(
+      when(() => mockHttpClient.delete("$baseUrl/tasks/1")).thenAnswer((_) async => HttpResponse(
             data: null,
             statusCode: 200,
             message: 'OK',
           ));
 
       // Act and Assert
-      await taskService.deleteTask("1");
+      await taskRepo.deleteTask("1");
     });
 
     test('deleteTask - failure', () async {
@@ -175,7 +177,7 @@ void main() {
       var error;
 
       try {
-        await taskService.deleteTask("1");
+        await taskRepo.deleteTask("1");
       } catch (e) {
         error = e;
       }

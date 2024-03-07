@@ -24,6 +24,9 @@ MVVM stands for Model-View-ViewModel, and it's a way to organize code when build
 The cool part about MVVM is that it keeps these sections separate. The View doesn't need to know where the data comes from, and the Model doesn't need to care about how its data is shown. This separation makes your code cleaner, easier to manage, and more fun to work with. Plus, it helps a lot with testing and fixing bugs since everything isn’t tangled up.
 
 ### File/Folder Structure
+Folder structure is very important to the maintenance of the application. We need to know where to find code and we need to be able to find it quickly. Depending on the way you think about your application, you might choose to keep similar part types together, example you might choose to keep all views together, all models together, all view models together. This is entirely up to you and your team to aid in good communication around maintenance of the code base. 
+
+Because we tend to have high level discussions around features of the application, even in developer meetings, I found it useful to keep all files related to a feature, close to each other.
 
 ```
 .
