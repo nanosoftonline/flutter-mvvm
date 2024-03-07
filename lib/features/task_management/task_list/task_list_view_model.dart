@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mvvm/features/task_management/models/task.dart';
-import 'package:mvvm/features/task_management/repositories/task_repository.dart';
+import 'package:mvvm/common/models/task.dart';
+import 'package:mvvm/features/task_management/task_management_repository.dart';
 
 class TaskListViewModel with ChangeNotifier {
   final ITaskRepository taskRepo;

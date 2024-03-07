@@ -1,8 +1,8 @@
 import 'package:clock/clock.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-import 'package:mvvm/features/task_management/models/task.dart';
-import 'package:mvvm/features/task_management/repositories/task_repository.dart';
+import 'package:mvvm/common/models/task.dart';
+import 'package:mvvm/features/task_management/task_management_repository.dart';
 import 'package:mvvm/features/task_management/task_new/task_new_view_model.dart';
 
 class MockTaskRepository extends Mock implements ITaskRepository {}

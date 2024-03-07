@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
-import 'package:mvvm/features/task_management/repositories/http_client.dart';
+import 'package:mvvm/common/services/http_client_contract.dart';
 
-class DioWrapper implements HttpClient {
+class DioClient implements HttpClientContract {
   final Dio _dio = Dio();
 
   @override

@@ -1,6 +1,6 @@
 import 'package:mvvm/config.dart';
-import 'package:mvvm/features/task_management/models/task.dart';
-import 'package:mvvm/features/task_management/repositories/http_client.dart';
+import 'package:mvvm/common/models/task.dart';
+import 'package:mvvm/common/services/http_client_contract.dart';
 
 const baseUrl = Config.apiBase;
 
@@ -12,7 +12,7 @@ abstract class ITaskRepository {
 }
 
 class TaskRepository implements ITaskRepository {
-  final HttpClient _httpClient;
+  final HttpClientContract _httpClient;
 
   TaskRepository(this._httpClient); // Inject the HttpClient instance
 

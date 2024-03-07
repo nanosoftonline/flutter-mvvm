@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mvvm/features/task_management/repositories/dio_wrapper.dart';
-import 'package:mvvm/features/task_management/repositories/task_repository.dart';
+import 'package:mvvm/common/services/dio_client.dart';
+import 'package:mvvm/features/task_management/task_management_repository.dart';
 import 'package:mvvm/features/task_management/task_new/task_new_view_model.dart';
 
 class CreateTaskView extends StatelessWidget {

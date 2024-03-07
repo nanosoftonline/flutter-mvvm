@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mvvm/features/task_management/components/task_list.dart';
-import 'package:mvvm/features/task_management/repositories/dio_wrapper.dart';
-import 'package:mvvm/features/task_management/repositories/task_repository.dart';
+import 'package:mvvm/common/services/dio_client.dart';
+import 'package:mvvm/features/task_management/task_management_repository.dart';
 import 'package:mvvm/features/task_management/task_list/task_list_view_model.dart';
 
 class TaskListView extends StatelessWidget {

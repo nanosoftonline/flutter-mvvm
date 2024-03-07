@@ -10,7 +10,7 @@ class HttpResponse {
   });
 }
 
-abstract class HttpClient {
+abstract class HttpClientContract {
   Future<HttpResponse> get(String path, {Map<String, dynamic>? queryParameters});
   Future<HttpResponse> post(String path, dynamic data);
   Future<HttpResponse> put(String path, dynamic data);

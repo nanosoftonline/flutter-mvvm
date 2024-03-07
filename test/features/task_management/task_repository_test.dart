@@ -2,13 +2,13 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:mvvm/config.dart';
-import 'package:mvvm/features/task_management/models/task.dart';
-import 'package:mvvm/features/task_management/repositories/http_client.dart';
-import 'package:mvvm/features/task_management/repositories/task_repository.dart';
+import 'package:mvvm/common/models/task.dart';
+import 'package:mvvm/common/services/http_client_contract.dart';
+import 'package:mvvm/features/task_management/task_management_repository.dart';
 
 const baseUrl = Config.apiBase;
 
-class MockHttpClient extends Mock implements HttpClient {}
+class MockHttpClient extends Mock implements HttpClientContract {}
 
 void main() {
   group('TaskRepository', () {
