@@ -8,7 +8,7 @@ import 'package:mvvm/features/task_management/task_management_repository.dart';
 
 const baseUrl = Config.apiBase;
 
-class MockHttpClient extends Mock implements HttpClientContract {}
+class MockHttpClient extends Mock implements IHttpClient {}
 
 void main() {
   group('TaskRepository', () {

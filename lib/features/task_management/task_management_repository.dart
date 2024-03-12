@@ -13,14 +13,14 @@ abstract class ITaskRepository {
 }
 
 class TaskRepository implements ITaskRepository {
-  final HttpClientContract _httpClient;
+  final IHttpClient httpClient;
 
-  TaskRepository(this._httpClient); // Inject the HttpClient instance
+  TaskRepository(this.httpClient); // Inject the HttpClient instance
 
   @override
   Future<List<Task>> fetchTasks() async {
     try {
-      final response = await _httpClient.get("$baseUrl/tasks");
+      final response = await httpClient.get("$baseUrl/tasks");
       final List<dynamic> responseData = response.data;
       return responseData.map((json) => Task.fromJson(json)).toList();
     } catch (e) {
@@ -31,7 +31,7 @@ class TaskRepository implements ITaskRepository {
   @override
   Future<Task> createTask(Task task) async {
     try {
-      var res = await _httpClient.post(
+      var res = await httpClient.post(
         "$baseUrl/tasks",
         task.toJson(),
       );
@@ -45,7 +45,7 @@ class TaskRepository implements ITaskRepository {
   @override
   Future<void> updateTask(Task task) async {
     try {
-      await _httpClient.put(
+      await httpClient.put(
         '$baseUrl/tasks/${task.id}',
         task.toJson(),
       );
@@ -57,7 +57,7 @@ class TaskRepository implements ITaskRepository {
   @override
   Future<void> deleteTask(String taskId) async {
     try {
-      await _httpClient.delete('$baseUrl/tasks/$taskId');
+      await httpClient.delete('$baseUrl/tasks/$taskId');
     } catch (e) {
       throw Exception('Failed to delete task');
     }
@@ -66,7 +66,7 @@ class TaskRepository implements ITaskRepository {
   @override
   Future<Task> fetchTask(String id) {
     try {
-      final response = _httpClient.get('$baseUrl/tasks/$id');
+      final response = httpClient.get('$baseUrl/tasks/$id');
       return response.then((value) => Task.fromJson(value.data));
     } catch (e) {
       throw Exception('Failed to fetch task');
