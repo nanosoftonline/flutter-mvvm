@@ -3,10 +3,11 @@ import 'package:mvvm/common/services/dio_client.dart';
 import 'package:mvvm/features/task_management/task_management_repository.dart';
 import 'package:mvvm/features/task_management/task_new/task_new_view_model.dart';
 
-class CreateTaskView extends StatelessWidget {
-  final TaskNewViewModel _viewModel = TaskNewViewModel(TaskRepository(DioWrapper()));
+class TaskNewView extends StatelessWidget {
+  static const routeName = '/createTask';
+  final TaskNewViewModel _viewModel = TaskNewViewModel(TaskRepository(DioClient()));
 
-  CreateTaskView({super.key});
+  TaskNewView({super.key});
 
   @override
   Widget build(BuildContext context) {

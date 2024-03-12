@@ -6,6 +6,7 @@ const baseUrl = Config.apiBase;
 
 abstract class ITaskRepository {
   Future<List<Task>> fetchTasks();
+  Future<Task> fetchTask(String id);
   Future<Task> createTask(Task task);
   Future<void> updateTask(Task task);
   Future<void> deleteTask(String taskId);
@@ -59,6 +60,16 @@ class TaskRepository implements ITaskRepository {
       await _httpClient.delete('$baseUrl/tasks/$taskId');
     } catch (e) {
       throw Exception('Failed to delete task');
+    }
+  }
+
+  @override
+  Future<Task> fetchTask(String id) {
+    try {
+      final response = _httpClient.get('$baseUrl/tasks/$id');
+      return response.then((value) => Task.fromJson(value.data));
+    } catch (e) {
+      throw Exception('Failed to fetch task');
     }
   }
 }

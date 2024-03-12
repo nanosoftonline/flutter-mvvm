@@ -6,16 +6,16 @@ In this blog post, we'll explore implementing a FDD(Feaure Driven Development) M
 
 ### Feature Driven Development
 
-Feature-driven development (FDD) arranges a software system based on its features instead of technical parts. It's about breaking down the system into manageable pieces centered around what it does for users. This approach helps in keeping things organized, making development easier, and ensuring the system aligns well with what users need. It's all about building things step by step and making sure the system grows smoothly as new features are added.
+Feature-driven development (FDD) arranges a software system based on its features instead of technical parts. It's about breaking down the system into manageable pieces centered around what it does for users(features). This approach helps in keeping things organized, making development easier, and ensuring the system aligns well with what users need. It's all about building things step by step and making sure the system grows smoothly as new features are added.
 
 ### One Feature, One Directory
 
 In feature-driven architecture, each feature typically corresponds to a separate module or folder within the codebase. This organizational structure helps keep related code, components, and resources together, making it easier to manage and understand the system. Each feature folder may contain everything related to that feature, such as components, models, view models, views, and other necessary files. This modular approach enhances code maintainability, scalability, and team collaboration.
 
 ### What is MVVM?
-MVVM stands for Model-View-ViewModel, and it's a way to organize code when building applications, especially ones with complex interfaces like websites, mobile apps, or desktop programs.
+MVVM stands for Model-View-ViewModel, and it's a way to organize code when building front-end UI-oriented applications.
 
-1. **Model**: This is the part of your app that deals with the actual data, rules, and logic. 
+1. **Model**: This is the part of your app that deals with the actual data, rules, and logic.*(The model could well take the form of one component or multiple components where a repository plus model is used)*
 
 2. **View**: This is what the users see and interact with. It's all about the visuals and layouts, like buttons, text, and images. The View is a display window that shows stuff from the Model but through the ViewModel.
 

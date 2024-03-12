@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:dio/dio.dart';
+import 'package:mvvm/features/task_management/task_edit/task_edit_view.dart';
 import 'package:mvvm/features/task_management/task_list/task_list_view.dart';
 import 'package:mvvm/features/task_management/task_new/task_new_view.dart';
 
-final dio = Dio();
-
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -19,10 +17,11 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      initialRoute: "/",
+      initialRoute: TaskListView.routeName,
       routes: {
-        "/": (context) => TaskListView(),
-        '/createTask': (context) => CreateTaskView(),
+        TaskListView.routeName: (context) => TaskListView(),
+        TaskNewView.routeName: (context) => TaskNewView(),
+        TaskEditView.routeName: (context) => TaskEditView(),
       },
     );
   }
