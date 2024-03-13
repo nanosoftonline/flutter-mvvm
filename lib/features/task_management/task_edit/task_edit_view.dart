@@ -4,7 +4,6 @@ import 'package:mvvm/features/task_management/task_edit/task_edit_view_model.dar
 import 'package:mvvm/features/task_management/task_management_repository.dart';
 
 class TaskEditView extends StatelessWidget {
-  static const routeName = '/editTask';
   final TaskEditViewModel viewModel = TaskEditViewModel(TaskRepository(DioClient()));
   final titleController = TextEditingController();
   final descriptionController = TextEditingController();
@@ -58,7 +57,7 @@ class TaskEditView extends StatelessWidget {
                 ElevatedButton(
                   onPressed: () {
                     viewModel.deleteTask(id);
-                    Navigator.pop(context); // Navigate back to the previous screen
+                    Navigator.pop(context);
                   },
                   child: const Text('Delete Task'),
                 ),

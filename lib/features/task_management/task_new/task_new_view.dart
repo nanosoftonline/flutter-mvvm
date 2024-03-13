@@ -4,7 +4,6 @@ import 'package:mvvm/features/task_management/task_management_repository.dart';
 import 'package:mvvm/features/task_management/task_new/task_new_view_model.dart';
 
 class TaskNewView extends StatelessWidget {
-  static const routeName = '/createTask';
   final TaskNewViewModel _viewModel = TaskNewViewModel(TaskRepository(DioClient()));
 
   TaskNewView({super.key});
